@@ -1409,40 +1409,41 @@ def better_exchook(
         # The standard except hook will also print the source of the SyntaxError,
         # so do it in a similar way here as well.
         filename = value.filename
+        if filename is not None:
         # Keep the output somewhat consistent with format_tb.
-        file_descr = "".join(
-            [
-                "  ",
-                color("File ", color.fg_colors[0], bold=True),
-                format_filename(filename),
-                ", ",
-                color("line ", color.fg_colors[0]),
-                color("%d" % value.lineno, color.fg_colors[4]),
-            ]
-        )
-        with output.fold_text_ctx(file_descr):
-            if not os.path.isfile(filename):
-                alt_fn = fallback_findfile(filename)
-                if alt_fn:
-                    output(
-                        color("    -- couldn't find file, trying this instead: ", color.fg_colors[0])
-                        + format_filename(alt_fn)
-                    )
-                    filename = alt_fn
-            source_code = get_source_code(filename, value.lineno)
-            if source_code:
-                # Similar to remove_indent_lines.
-                # But we need to know the indent-prefix such that we can use the syntax-error offset.
-                source_code = replace_tab_indents(source_code)
-                lines = source_code.splitlines(True)
-                indent_prefix = get_same_indent_prefix(lines)
-                if indent_prefix is None:
-                    indent_prefix = ""
-                source_code = "".join([line[len(indent_prefix) :] for line in lines])
-                source_code = source_code.rstrip()
-                prefix = "    line: "
-                output(prefix, color.py_syntax_highlight(source_code), color=color.fg_colors[0])
-                output(" " * (len(prefix) + value.offset - len(indent_prefix) - 1) + "^", color=color.fg_colors[4])
+            file_descr = "".join(
+                [
+                    "  ",
+                    color("File ", color.fg_colors[0], bold=True),
+                    format_filename(filename),
+                    ", ",
+                    color("line ", color.fg_colors[0]),
+                    color("%d" % value.lineno, color.fg_colors[4]),
+                ]
+            )
+            with output.fold_text_ctx(file_descr):
+                if not os.path.isfile(filename):
+                    alt_fn = fallback_findfile(filename)
+                    if alt_fn:
+                        output(
+                            color("    -- couldn't find file, trying this instead: ", color.fg_colors[0])
+                            + format_filename(alt_fn)
+                        )
+                        filename = alt_fn
+                source_code = get_source_code(filename, value.lineno)
+                if source_code:
+                    # Similar to remove_indent_lines.
+                    # But we need to know the indent-prefix such that we can use the syntax-error offset.
+                    source_code = replace_tab_indents(source_code)
+                    lines = source_code.splitlines(True)
+                    indent_prefix = get_same_indent_prefix(lines)
+                    if indent_prefix is None:
+                        indent_prefix = ""
+                    source_code = "".join([line[len(indent_prefix) :] for line in lines])
+                    source_code = source_code.rstrip()
+                    prefix = "    line: "
+                    output(prefix, color.py_syntax_highlight(source_code), color=color.fg_colors[0])
+                    output(" " * (len(prefix) + value.offset - len(indent_prefix) - 1) + "^", color=color.fg_colors[4])
 
     import types
 
