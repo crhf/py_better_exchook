@@ -48,9 +48,6 @@ Although there might be a few more useful functions, thus we export all of them.
 
 Also see the demo/tests at the end.
 """
-
-from __future__ import annotations
-
 import sys
 import os
 import os.path
